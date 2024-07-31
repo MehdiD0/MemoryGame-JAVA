@@ -1,15 +1,16 @@
-# GamePanel Project
+# Memory Game
 
 ## Overview
 
-The GamePanel project is a Java-based graphical application using Swing to display a grid of colored rectangles. The project includes features to change the color of the rectangles and display a countdown timer.
+The Memory Game is a Java-based graphical application using Swing to create a memory challenge. The game displays a grid of colored rectangles. Initially, all rectangles are shown in their real colors for a brief period. After this period, the colors are hidden, and the player must select the rectangle matching a given color.
 
 ### Features
 
-- **Grid of Rectangles**: Displays a grid of colored rectangles on the panel.
-- **Color Changes**: Initially, all rectangles are shown in their real color for 10 seconds, then revert to a fake color.
-- **Timer Display**: Shows a countdown timer in the top right corner, which stops and displays "Time's Up" when the countdown reaches zero.
-- **Mouse Interaction**: Allows interaction with rectangles via mouse clicks.
+- **Color Grid**: Displays a grid of rectangles with different colors.
+- **Initial Display**: All rectangles are shown in their real colors for 10 seconds.
+- **Color Hiding**: After the initial display period, the rectangles revert to a fake color.
+- **User Interaction**: The player must click on the rectangle that matches a specified color.
+- **Timer**: A countdown timer shows the remaining time for the initial display period.
 
 ## Getting Started
 
