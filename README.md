@@ -1,18 +1,25 @@
+# GamePanel Project
+
+## Overview
+
+The GamePanel project is a Java-based graphical application using Swing to display a grid of colored rectangles. The project includes features to change the color of the rectangles and display a countdown timer.
+
+### Features
+
+- **Grid of Rectangles**: Displays a grid of colored rectangles on the panel.
+- **Color Changes**: Initially, all rectangles are shown in their real color for 10 seconds, then revert to a fake color.
+- **Timer Display**: Shows a countdown timer in the top right corner, which stops and displays "Time's Up" when the countdown reaches zero.
+- **Mouse Interaction**: Allows interaction with rectangles via mouse clicks.
+
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+### Prerequisites
 
-## Folder Structure
+- **Java Development Kit (JDK)**: Ensure you have JDK 8 or higher installed. You can download it from [Oracle's website](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) or use a package manager.
 
-The workspace contains two folders by default, where:
+### Setup
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+1. **Clone the Repository**
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+   ```sh
+   git clone <repository-url>
