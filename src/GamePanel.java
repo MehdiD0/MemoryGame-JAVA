@@ -8,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -22,6 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Timer updateTimer; // Timer for updating display
     private long startTime; // Start time of the 10 seconds
     private long elapsedTime; // Elapsed time since the start
+    private Image backgroundImage;
 
     Thread gameThread;
 
@@ -48,6 +51,8 @@ public class GamePanel extends JPanel implements Runnable {
         
         // Display real colors initially
         showRealColors();
+
+        backgroundImage = new ImageIcon("./background.jpg").getImage();
     }
 
     // Method to initialize rectangles
@@ -103,6 +108,8 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // Ensure proper painting
+
+        g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
         
         for (ColoredRectangle coloredRect : rectangles) {
             g.setColor(coloredRect.getColor()); // Set color for the rectangle
