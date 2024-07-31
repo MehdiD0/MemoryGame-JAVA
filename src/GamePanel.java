@@ -3,7 +3,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -166,7 +165,7 @@ public class GamePanel extends JPanel implements Runnable {
         
         g.setColor(Color.WHITE); // Timer color
         g.setFont(new Font("Arial", Font.BOLD, 20)); // Timer font and size
-        g.drawString(timerText, screenWidth - 150, 30); // Draw the timer text at the top right corner
+        g.drawString(timerText, screenWidth - 200, 80); // Draw the timer text at the top right corner
     }
 
     public List<ColoredRectangle> getRectangles() {
