@@ -3,62 +3,79 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Random;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    final int screenWidth = 1200;
-    final int screenHeight = 800;
-    
+    private static final int SCREEN_WIDTH = 1200;
+    private static final int SCREEN_HEIGHT = 800;
+    private static final int RECT_WIDTH = 70;
+    private static final int RECT_HEIGHT = 90;
+    private static final int COLOR_DISPLAY_DURATION = 10000; // 10 seconds in milliseconds
+    private static final int RECT_TOP_LEFT_SIZE = 70; // Size of the rectangle shown after time is up
+
     private List<ColoredRectangle> rectangles; // List to store rectangle information
     private Timer colorTimer; // Timer for reverting colors
-    private final long colorDisplayDuration = 10000; // 10 seconds in milliseconds
     private Timer updateTimer; // Timer for updating display
     private long startTime; // Start time of the 10 seconds
     private long elapsedTime; // Elapsed time since the start
     private Image backgroundImage;
-
-    Thread gameThread;
+    private Thread gameThread;
+    private boolean showTopLeftRectangle; // Flag to show the top left rectangle
+    private Color topLeftRectangleColor; // Color of the top left rectangle
+    private JButton restartButton; // Button to restart the game
 
     public GamePanel() {
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setDoubleBuffered(true);
-        this.addMouseListener(new MouseAdapter() {
+        backgroundImage = new ImageIcon("./background.jpg").getImage();
+        setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
+        setLayout(null); // Use absolute positioning
+        setDoubleBuffered(true);
+        addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 blockClicked(e.getX(), e.getY());
             }
         });
 
-        rectangles = new ArrayList<>(); // Initialize the list of rectangles
-        initializeRectangles(); // Populate the list with rectangles
+        rectangles = new ArrayList<>();
+        initializeRectangles();
 
-        // Initialize the timer for reverting colors
-        colorTimer = new Timer((int) colorDisplayDuration, e -> revertColors());
-        colorTimer.setRepeats(false); // Timer should only run once
+        colorTimer = new Timer(COLOR_DISPLAY_DURATION, e -> revertColors());
+        colorTimer.setRepeats(false);
 
-        // Initialize the timer for updating display
-        updateTimer = new Timer(1000, e -> updateElapsedTime()); // Update every second
-        updateTimer.start(); // Start the update timer
-        
-        // Display real colors initially
+        updateTimer = new Timer(1000, e -> updateElapsedTime());
+        updateTimer.start();
+
         showRealColors();
 
-        backgroundImage = new ImageIcon("./background.jpg").getImage();
+        // Initialize and add the restart button
+        restartButton = new JButton("Play Again");
+        restartButton.setBounds(50, SCREEN_HEIGHT - SCREEN_HEIGHT /2, 120, 30);
+        restartButton.setVisible(false);
+        restartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                restartGame();
+            }
+        });
+        add(restartButton);
     }
 
-    // Method to initialize rectangles
     private void initializeRectangles() {
-        for (int x = screenWidth / 4; x <= screenWidth * 2 / 3; x += 100) {
-            for (int y = screenHeight / 4; y <= screenHeight * 2 / 3; y += 100) {
-                rectangles.add(new ColoredRectangle(x, y, 80, 80));
+        for (int x = SCREEN_WIDTH / 4; x <= SCREEN_WIDTH * 2 / 3; x += 100) {
+            for (int y = SCREEN_HEIGHT / 4; y <= SCREEN_HEIGHT * 2 / 3; y += 100) {
+                rectangles.add(new ColoredRectangle(x, y, RECT_WIDTH, RECT_HEIGHT));
             }
         }
     }
@@ -70,68 +87,44 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        final int FPS = 60; // Desired frames per second
-        final long optimalTime = 1000000000 / FPS; // Time per frame in nanoseconds
+        colorTimer = new Timer(COLOR_DISPLAY_DURATION, e -> revertColors());
+        colorTimer.setRepeats(false);
 
-        long lastFrameTime = System.nanoTime();
-        long now;
-        long updateLength;
-        long waitTime;
-        long totalTime = 0;
+        updateTimer = new Timer(1000, e -> updateElapsedTime());
+        updateTimer.start();
 
-        while (true) {
-            now = System.nanoTime();
-            updateLength = now - lastFrameTime;
-            lastFrameTime = now;
-            totalTime += updateLength;
-
-            waitTime = optimalTime - updateLength;
-
-            if (waitTime < 0) {
-                waitTime = 5; // Avoid negative sleep time
-            }
-
-            try {
-                Thread.sleep(waitTime / 1000000L); // Convert nanoseconds to milliseconds
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            if (totalTime >= optimalTime) {
-                totalTime = 0;
-                repaint(); // Redraw the panel
-            }
-        }
+        showRealColors();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); // Ensure proper painting
+        super.paintComponent(g);
 
-        g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
-        
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+
         for (ColoredRectangle coloredRect : rectangles) {
-            g.setColor(coloredRect.getColor()); // Set color for the rectangle
-            g.fillRect(coloredRect.getRectangle().x, coloredRect.getRectangle().y, 
-                       coloredRect.getRectangle().width, coloredRect.getRectangle().height);
-            g.setColor(Color.BLACK); // Set color for the border
-            g.drawRect(coloredRect.getRectangle().x, coloredRect.getRectangle().y, 
-                       coloredRect.getRectangle().width, coloredRect.getRectangle().height);
+            g.setColor(coloredRect.getColor());
+            g.fillRect(coloredRect.getRectangle().x, coloredRect.getRectangle().y,
+                    coloredRect.getRectangle().width, coloredRect.getRectangle().height);
+            g.setColor(Color.BLACK);
+            g.drawRect(coloredRect.getRectangle().x, coloredRect.getRectangle().y,
+                    coloredRect.getRectangle().width, coloredRect.getRectangle().height);
         }
 
-        // Draw the timer
+        if (showTopLeftRectangle) {
+            drawTopLeftRectangle(g);
+        }
+
         drawTimer(g);
     }
 
-    // Method to display all rectangles in their real color
     private void showRealColors() {
-        startTime = System.currentTimeMillis(); // Record the start time
+        startTime = System.currentTimeMillis();
         for (ColoredRectangle rect : rectangles) {
             rect.showRealColor();
         }
-        repaint(); // Request a redraw
+        repaint();
 
-        // Start the timer to revert colors after 10 seconds
         colorTimer.start();
     }
 
@@ -139,47 +132,79 @@ public class GamePanel extends JPanel implements Runnable {
         for (ColoredRectangle rect : rectangles) {
             rect.revertToFakeColor();
         }
-        repaint(); // Request a redraw
+        showTopLeftRectangle = true;
+
+        // Select and store the random color once
+        Random r = new Random();
+        int randomInt = r.nextInt(rectangles.size());
+        topLeftRectangleColor = rectangles.get(randomInt).getRealColor();
+
+        repaint();
     }
 
     private void updateElapsedTime() {
         elapsedTime = System.currentTimeMillis() - startTime;
-        
-        if (elapsedTime >= colorDisplayDuration) {
-            elapsedTime = colorDisplayDuration; // Ensure it doesn't exceed the display duration
-            updateTimer.stop(); // Stop the update timer
+
+        if (elapsedTime >= COLOR_DISPLAY_DURATION) {
+            elapsedTime = COLOR_DISPLAY_DURATION;
+            updateTimer.stop();
         }
-        
-        repaint(); // Request a redraw to update the timer display
+
+        repaint();
     }
 
     private void drawTimer(Graphics g) {
-        long remainingTime = (colorDisplayDuration - elapsedTime) / 1000; // Time remaining in seconds
-        String timerText;
-        
-        if (elapsedTime >= colorDisplayDuration) {
-            timerText = "Time's Up";
-        } else {
-            timerText = "Remaining: " + remainingTime + "s";
-        }
-        
-        g.setColor(Color.WHITE); // Timer color
-        g.setFont(new Font("Arial", Font.BOLD, 20)); // Timer font and size
-        g.drawString(timerText, screenWidth - 200, 80); // Draw the timer text at the top right corner
+        long remainingTime = (COLOR_DISPLAY_DURATION - elapsedTime) / 1000;
+        String timerText = (elapsedTime >= COLOR_DISPLAY_DURATION) ? "Time's Up" : "Remaining: " + remainingTime + "s";
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString(timerText, SCREEN_WIDTH - 200, 80);
+    }
+
+    private void drawTopLeftRectangle(Graphics g) {
+        g.setColor(topLeftRectangleColor);
+        g.fillRect(40, 40, RECT_TOP_LEFT_SIZE, RECT_TOP_LEFT_SIZE);
+        g.setColor(Color.BLACK);
+        g.drawRect(40, 40, RECT_TOP_LEFT_SIZE, RECT_TOP_LEFT_SIZE);
     }
 
     public List<ColoredRectangle> getRectangles() {
         return rectangles;
     }
 
-    public void blockClicked(int x, int y) {
-        // Determine which rectangle was clicked
+    private void blockClicked(int x, int y) {
         for (ColoredRectangle rect : rectangles) {
             if (rect.getRectangle().contains(x, y)) {
-                rect.showRealColor();
-                break; // Stop after the first matching rectangle
+                if (rect.getRealColor().equals(topLeftRectangleColor)) {
+                    restartGame();
+                } else {
+                    showIncorrectSelection();
+                }
+                break;
             }
         }
-        repaint(); // Request a redraw
+        repaint();
+    }
+
+    private void restartGame() {
+        showTopLeftRectangle = false;
+        initializeRectangles();
+        showRealColors();
+        updateTimer.start();
+        restartButton.setVisible(false);
+    }
+
+    private void showIncorrectSelection() {
+        JOptionPane.showMessageDialog(this, "Wrong choice! Here are the correct rectangles.", "Incorrect", JOptionPane.ERROR_MESSAGE);
+
+        for (ColoredRectangle rect : rectangles) {
+            if (rect.getRealColor().equals(topLeftRectangleColor)) {
+                rect.showRealColor();
+            }
+        }
+
+        repaint();
+        restartButton.setVisible(true);
     }
 }

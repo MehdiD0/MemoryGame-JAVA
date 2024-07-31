@@ -32,6 +32,10 @@ public class ColoredRectangle {
         this.currentColor = color;
     }
 
+    public Color getRealColor() {
+        return this.realColor;
+    }
+
     public Color getRandomColor() {
         ArrayList<Color> colors = new ArrayList<>(Arrays.asList(Color.green, Color.red, Color.orange, Color.magenta));
         Random r = new Random();
