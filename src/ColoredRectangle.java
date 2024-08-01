@@ -39,7 +39,7 @@ public class ColoredRectangle {
     public Color getRandomColor() {
         ArrayList<Color> colors = new ArrayList<>(Arrays.asList(Color.green, Color.red, Color.orange, Color.magenta));
         Random r = new Random();
-        int randomInt = r.nextInt(4);
+        int randomInt = r.nextInt(colors.size());
         return colors.get(randomInt);
     }
 
@@ -53,5 +53,9 @@ public class ColoredRectangle {
 
     public Color getFakeColor() {
         return fakeColor;
+    }
+
+    public boolean isColorMatching(Color color) {
+        return this.realColor.getRGB() == color.getRGB();
     }
 }

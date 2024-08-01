@@ -61,7 +61,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Initialize and add the restart button
         restartButton = new JButton("Play Again");
-        restartButton.setBounds(50, SCREEN_HEIGHT - SCREEN_HEIGHT /2, 120, 30);
+        restartButton.setBounds(SCREEN_WIDTH - SCREEN_WIDTH/2 - 60 , SCREEN_HEIGHT - 100, 120, 30);
         restartButton.setVisible(false);
         restartButton.addActionListener(new ActionListener() {
             @Override
@@ -176,7 +176,7 @@ public class GamePanel extends JPanel implements Runnable {
     private void blockClicked(int x, int y) {
         for (ColoredRectangle rect : rectangles) {
             if (rect.getRectangle().contains(x, y)) {
-                if (rect.getRealColor().equals(topLeftRectangleColor)) {
+                if (rect.isColorMatching(topLeftRectangleColor)) {
                     restartGame();
                 } else {
                     showIncorrectSelection();
@@ -189,17 +189,19 @@ public class GamePanel extends JPanel implements Runnable {
 
     private void restartGame() {
         showTopLeftRectangle = false;
+        rectangles.clear();
         initializeRectangles();
         showRealColors();
         updateTimer.start();
         restartButton.setVisible(false);
+
     }
 
     private void showIncorrectSelection() {
         JOptionPane.showMessageDialog(this, "Wrong choice! Here are the correct rectangles.", "Incorrect", JOptionPane.ERROR_MESSAGE);
 
         for (ColoredRectangle rect : rectangles) {
-            if (rect.getRealColor().equals(topLeftRectangleColor)) {
+            if (rect.isColorMatching(topLeftRectangleColor)) {
                 rect.showRealColor();
             }
         }
